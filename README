@@ -1,0 +1,26 @@
+Searchsaver
+----
+
+This utility grabs all your saved searches, downloads the results,
+and then runs every N minutes to grab any new search results.
+
+Twitter currently doesn't keep search results available for more than a few days, 
+which is a shame when you're interested in mesauring the # of results over time,
+or if you just don't look at your saved searches that much.
+
+Every 'new' result set is saved to disk for simplicity (no sqlite etc.)
+
+Usage
+1. copy config.sample.yml to config.yml and edit
+2. ruby archive.rb
+3. enjoy your tweets!
+
+
+Jamie Wilkinson (@jamiew)
+<http://jamiedubs.com>
+<http://github.com/jamiew>
+
+Copyfree Free Art & Technology (F.A.T.) Lab, 2010
+Speed Project Approved: 30 mins
+<http://fffff.at>
+
