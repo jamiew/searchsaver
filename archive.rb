@@ -1,11 +1,33 @@
+#!/usr/bin/env ruby
 #
-# Archive your Twitter Saved Searches
-# not very smart right now -- you'll need to do a lot of massaging afterwards
-# ...but at least it's saving them
+# SEARCHSAVER!
+# Archive tweets from your Twitter Saved Searches
 #
-# Jamie Wilkinson <http://jamiedubs.com>
-# http://github.com/jamiew
+# Not very smart right now -- you'll need to do some data massaging
+# because it's just saving the raw JSON dumps. But at least it's saving them
 #
+# DEPENDENCIES
+#   sudo gem install mechanize json cgi
+#
+# CONFIGURATION
+#   1. cp config.sample.yml config.yml
+#   2. put in your Twitter username, password & seconds between downloads
+#   3. use Twitter.com's "Save This Search" to add new queries
+#   4. run the archiver!
+#
+# USAGE - runs forever, downloading every N seconds: 
+#   ruby archive.rb
+#
+# USAGE - run once (e.g. via cronjob): 
+#   LOOP=0 ruby archive.rb 
+#
+# 
+# Source code released under an MIT License
+# Jamie Wilkinson / FAT Lab / 2010
+# @jamiew | http://jamiedubs.com | http://fffff.at
+#
+
+
 require 'rubygems'
 require 'mechanize' #could just use open-uri to minimize dependencies, not using any mechanize fanciness
 require 'json' #rather than XML -- again
@@ -16,10 +38,10 @@ raise "No config.yml file! Aborting" if config.nil?
 raise "Need user, password, and frequency in config.yml" unless config['user'] && config['pass'] && config['frequency']
 
 # Initialize process by fetching our saved searches
-# TODO: these could be cached, say, daily
+# TODO these could be cached, say, hourly
 searches_url = "http://twitter.com/saved_searches.json"
 puts "Fetching #{searches_url} ..."
-agent = WWW::Mechanize.new
+agent = Mechanize.new
 agent.auth(config['user'], config['pass'])
 agent.get(searches_url)
 searches = JSON.parse(agent.page.body)
@@ -75,10 +97,13 @@ while true do
   
   end
   
-  # Snooze between runs.
-  puts "Sleeping for #{config['frequency']} seconds..."
-  sleep config['frequency']
-  
+  # Snooze between runs, or bail if this is a one-off (e.g. via CRON)
+  if ENV['loop'] == '0' || ENV['loop'] == 'false'
+    break
+  else
+    puts "Sleeping for #{config['frequency']} seconds..."
+    sleep config['frequency']
+  end
 end
 
 exit 0
